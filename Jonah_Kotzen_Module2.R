@@ -45,15 +45,14 @@ ggplot(pseed.sum.max, aes(x = speed, y = amp.sum.mean, color = fish)) +
   geom_errorbar(aes(ymin = amp.sum.mean - amp.sum.se, ymax = amp.sum.mean + amp.sum.se), width = 0.2) +
   labs(x = "Specific Swimming Speed", y = "Mean amp.sum", title = "Mean amp.sum vs. Swimming Speed")
 
-# Step 5: Download the file and read it as a tibble
-download.file("URL_TO_FILE.csv", "external_data.csv")
-external_data <- read_csv("external_data.csv")
+# Step 5: Download pseed.met.rate and read it as a tibble
+pseed.met.rate <- read_csv("pseed.met.rate.csv")
 
 # Step 6: Merge external_data with pseed.sum.max
-merged_data <- left_join(pseed.sum.max, external_data, by = "specimen")
+merged_data <- left_join(pseed.sum.max, pseed.met.rate, by = "fish")
 
 # Step 7: Plot metabolic power output vs. mean maximum of amp.sum
-ggplot(merged_data, aes(x = amp.sum.mean, y = metabolic_power, color = specimen)) +
+ggplot(merged_data, aes(x = amp.sum.mean, y = met.rate, color = fish)) +
   geom_point() +
   labs(x = "Mean amp.sum", y = "Metabolic Power Output", title = "Metabolic Power vs. Mean amp.sum")
 
