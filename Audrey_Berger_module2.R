@@ -19,3 +19,5 @@ pseed2 <- pseed2%>%
 pseed2 <- pseed2%>%
   mutate(bl.s=cm.s/bl)%>%
   print()
+pseed2%>%
+  ggplot(aes(x=bl.s,y=amp.bl))+geom_point()
