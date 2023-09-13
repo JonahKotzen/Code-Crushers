@@ -18,7 +18,7 @@ pseed.wide <- pseed2 %>%
   pivot_wider(names_from = fin,values_from = amp.bl) %>%
   mutate(amp.sum=L+R)%>%
   print() 
-View(pseed.wide)
+pseed.wide
 
 
 # Step 2: Create a custom function to compute the standard error of the mean (SE)
