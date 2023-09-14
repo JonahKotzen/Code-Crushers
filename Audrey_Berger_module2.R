@@ -69,5 +69,54 @@ pseed.max <- pseed2%>%
   filter(peak==T)%>%
   ggplot(aes(x=bl.s,y=amp.bl))+geom_point()+geom_smooth(method="lm")
 
+#this part is not working
 amp.aov <- aov(amp.bl~bl.s,pseed.max)
 summary(amp.aov)
+
+#telling me it can't apply to a ggplot
+pseed.max%>%
+  group_by(fish, bl.s)%>%
+  summarize(mean.max=mean(amp.bl))%>%
+  ggplot(aes(x=bl.s,y=mean.max,col=fish))+geom_point()+geom_smooth(method="lm")
+
+pseed.wide <- pseed2%>%
+  select(-amp)%>%
+  pivot_wider(names_from=fin, values_from=amp.bl)%>%
+  mutate(amp.sum=L+R)%>%
+  print()
+
+
+
+#this is where the code for the project report is
+library(tidyverse)
+library(features)
+
+pseed <- read_csv("pseed.fin.amps.csv")
+pseed.bl <- read_csv("pseed.lengths.csv")
+speeds <- read_csv("pseed.calibration.csv")
+
+pseed2 <- pseed%>%
+  left_join(speeds, by=c("speed"="vol")) %>%
+  left_join(pseed.bl,by="fish")%>%
+  mutate(bl.s=cm.s/bl) %>%
+  print()
+
+pseed.wide <- pseed2 %>%
+  select(-amp) %>%
+  pivot_wider(names_from=fin, values_from=amp.bl)%>%
+  mutate(amp.sum=L+R)%>%
+  view()
+
+#Create a custom function that computes SE
+se_mean <- function(x){
+  se <- sd(x)/sqrt(length(x))
+  return(se)
+}
+
+pseed.sum.max <- pseed.wide%>%
+  group_by(fish,speed)%>%
+  mutate(peak=frame %in% find.peaks(frame,amp.sum))%>%
+  filter(peak==T)%>%
+  se_mean()
+
+  
