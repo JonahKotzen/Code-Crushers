@@ -52,7 +52,7 @@ pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="bl.s")%>%
 
 view(pseed.final)
 
-
+#stillworking
   
 #Plot metabolic power output vs. mean maximum of amp.sum 
 ggplot(merged_data, aes(x = amp.sum.mean, y = met.rate, color = fish)) +
