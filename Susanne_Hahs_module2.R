@@ -18,8 +18,8 @@ pseed.wide <- pseed2 %>%
   view()
 
 #Create custom function to compute the standard error of the mean (SE)
-compute_se <- function(x) {
-  se <- sd(x) / sqrt(length(x))
+compute_se <- function(amp.sum) {
+  se <- sd(amp.sum) / sqrt(length(amp.sum))
   return(se)
 }
 
