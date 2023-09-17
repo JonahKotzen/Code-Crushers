@@ -1,6 +1,8 @@
 #Establishing data
 library(tidyverse)
 library(dplyr)
+library(features)
+
 pseed <- read_csv("pseed.fin.amps.csv")
 pseed.bl <- read_csv("pseed.lengths.csv")
 speeds <- read_csv("pseed.calibration.csv")
@@ -15,17 +17,13 @@ pseed.wide <- pseed2 %>%
   select(-amp) %>%
   pivot_wider(names_from=fin, values_from=amp.bl)%>%
   mutate(amp.sum=L+R)%>%
-  view()
+  print()
 
 #Create custom function to compute the standard error of the mean (SE)
-compute_se <- function(amp.sum) {
-  se <- sd(amp.sum) / sqrt(length(amp.sum))
-  return(se)
+se_mean <- function(amp.sum){
+  se <- sd(amp.sum)/sqrt(length(amp.sum))
 }
 
-
-
-#Compute mean maximum of all amp.sum for each swimming speed and fish 
 pseed.sum.max <- pseed.wide%>%
   group_by(fish,speed,bl.s)%>%
   summarize(
@@ -33,19 +31,30 @@ pseed.sum.max <- pseed.wide%>%
     amp.sum.se=se_mean(amp.sum))
 
 
+ggplot(pseed.sum.max,aes(x=speed,y=amp.sum.mean,col=fish)) +
+  geom_errorbar(aes(ymin=amp.sum.mean-amp.sum.se, ymax=amp.sum.mean+amp.sum.se), width=.1) +
+  geom_line()+geom_point()
+
+
+#Compute mean maximum of all amp.sum for each swimming speed and fish 
+pseed.sum.max <- pseed.wide %>%
+  group_by(speed, fish,bl.s) %>%
+  summarise(amp.sum.mean = mean(amp.sum, na.rm = TRUE),amp.sum.se = compute_se(amp.sum)) %>%
+  print()
+
+
 
 #Plot mean amp.sum vs specific swimmming speed and add error bars
 ggplot(pseed.sum.max, aes(x = speed, y = amp.sum.mean, color = fish)) +
   geom_point() +
-  geom_errorbar(aes(ymin = amp.sum.mean - amp.sum.se, ymax = amp.sum.mean + amp.sum.se), width = 0.2,) +
+  geom_errorbar(aes(ymin = amp.sum.mean - amp.sum.se, ymax = amp.sum.mean + amp.sum.se), width = 0.1,) +
   labs(x = "Specific Swimming Speed", y = "Mean amp.sum", title = "Mean amp.sum vs. Swimming Speed")
 
 
 
 
 #Download file as tibble and merge with pseed.sum.max
-pseed.met.rate <- read_csv("pseed.met.rate.csv")
-
+pseed.met.rate<-read_csv("pseed.met.rate.csv")
 pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="bl.s")%>%
   select(-fish.y)%>%
   rename("Fish"="fish.x")
