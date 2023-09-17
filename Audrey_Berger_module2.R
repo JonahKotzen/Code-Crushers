@@ -35,19 +35,26 @@ pseed.sum.max <- pseed.wide%>%
     amp.sum.mean=mean(amp.sum,na.rm=TRUE),
     amp.sum.se=se_mean(amp.sum))
 
+<<<<<<< HEAD
 ggplot(pseed.sum.max,aes(x=speed,y=amp.sum.mean,col=fish)) +
   geom_errorbar(aes(ymin=amp.sum.mean-amp.sum.se, ymax=amp.sum.mean+amp.sum.se), width=.1) +
   geom_line()+geom_point()
 
+=======
+>>>>>>> 246ee6257e420ce029c9c7240aaa8a05bf37b1f6
 view(pseed.sum.max)
 #need to find the peaks since these are the max amps
 #amp.sum=amp of both fins, group_by(fish, speed)
 #will have to compute amplitude of cycles in each experiment
 #6 look for common variable names, look at table
   #fish, date, speeds and body lengths are common variable
+<<<<<<< HEAD
 #use features to fnd max of amp.sums
 
 pseed.met.rate <- read_csv("pseed.met.rate.csv")
 
 pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="fish")
 view(pseed.wide)
+=======
+#use features to fnd max of amp.sums
+>>>>>>> 246ee6257e420ce029c9c7240aaa8a05bf37b1f6
