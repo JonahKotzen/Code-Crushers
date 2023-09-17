@@ -1,7 +1,7 @@
 library(tidyverse)
 library(features)
 
-#combine code to establish pseed.wide
+#1) Combine code to establish pseed.wide
 pseed <- read_csv("pseed.fin.amps.csv")
 pseed.bl <- read_csv("pseed.lengths.csv")
 speeds <- read_csv("pseed.calibration.csv")
@@ -18,54 +18,44 @@ pseed.wide <- pseed2 %>%
   mutate(amp.sum=L+R)%>%
   view()
 
-#Create a custom function that computes SE
-
-#x and y values, amplitude and timeframe, pass info to features function
-#will only take peaks for own tibble, pass amplitude data and summarize
-#group by fish, experiment, fin
-#use values of those arguments in brackets to do operations on those values
-se_mean <- function(amp.sum){
-  se <- sd(amp.sum)/sqrt(length(amp.sum))
+#2) Create a custom function that computes SE
+se_mean <- function(x){
+  se <- sd(x)/sqrt(length(x))
 }
 
-pseed.sum.max <- pseed.wide%>%
+#3) Determine the maxes and then find the mean max of amp.sum values
+find.maxes <- function(x,y,mult=100){
+  f <- fget(features(x=x,y=y*mult))[2:3]%>%
+    as_tibble()%>%
+    filter(curvature<0)%>%
+    mutate(peak=round(crit.pts,0))
+  return(f$peak)
+}
+pseed.peaks <- pseed.wide%>%
+  group_by(date,fish)%>%
+  mutate(peak=frame%in% find.maxes(frame,amp.sum))%>%
+  filter(peak==T)
+
+#4) Add the amp.sum.se values (this is also the code that adds amp.sum.max)
+pseed.sum.max <- pseed.peaks%>%
   group_by(fish,speed,bl.s)%>%
   summarize(
     amp.sum.mean=mean(amp.sum,na.rm=TRUE),
     amp.sum.se=se_mean(amp.sum))
 
+#5) Plot the mean amp.sum vs specific swimming speed with error bars
+ggplot(pseed.sum.max,aes(x=bl.s,y=amp.sum.mean,col=fish)) +
+  geom_errorbar(aes(ymin=amp.sum.mean-amp.sum.se, ymax=amp.sum.mean+amp.sum.se), width=.1) +geom_point()
 
-ggplot(pseed.sum.max,aes(x=speed,y=amp.sum.mean,col=fish)) +
-  geom_errorbar(aes(ymin=amp.sum.mean-amp.sum.se, ymax=amp.sum.mean+amp.sum.se), width=.1) +
-  geom_line()+geom_point()
 
-<<<<<<< HEAD
-=======
-
-#need to find the peaks since these are the max amps
-#amp.sum=amp of both fins, group_by(fish, speed)
-#will have to compute amplitude of cycles in each experiment
-#6 look for common variable names, look at table
-  #fish, date, speeds and body lengths are common variable
-#use features to fnd max of amp.sums
->>>>>>> 462ff0fb63c688811f63d4666a1022ea2d3da537
-
-#Download pseed.met.rate and read it as a tibble
+#6) Download pseed.met.rate and read it as a tibble
 pseed.met.rate <- read_csv("pseed.met.rate.csv")
 
-<<<<<<< HEAD
-#Join the pseed.met.rate table with pseed.wide
-=======
->>>>>>> 462ff0fb63c688811f63d4666a1022ea2d3da537
-pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="bl.s")%>%
-  select(-fish.y)%>%
-  rename("Fish"="fish.x")
+#Join the pseed.met.rate table with pseed.sum.max
+
+pseed.final <- merge(x=pseed.sum.max,y=pseed.met.rate[c("date","met.rate")], by="date",all.x=TRUE)
   
 view(pseed.final)
-#use features to fnd max of amp.sums
-<<<<<<< HEAD
 
-ggplot(pseed.final,aes(x=met.rate,y=amp.sum.mean,col=Fish))+
-  geom_line()+geom_point()
-=======
->>>>>>> 462ff0fb63c688811f63d4666a1022ea2d3da537
+#7) Use ggplot to plot metabolic power output vs mean max of amp.sum
+ggplot(pseed.final,aes(x=amp.sum.mean,y=met.rate,col=Fish))+geom_point()
