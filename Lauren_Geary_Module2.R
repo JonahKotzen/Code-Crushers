@@ -51,3 +51,4 @@ view(pseed.final)
 ggplot(merged_data, aes(x = amp.sum.mean, y = met.rate, color = fish)) +
   geom_point() +
   labs(x = "Mean amp.sum", y = "Metabolic Power Output", title = "Metabolic Power vs. Mean amp.sum")
+
