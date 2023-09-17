@@ -1,5 +1,6 @@
 library(tidyverse)
 library(dplyr)
+library(features)
 
 #load data to establish pseed.wide
 pseed <- read_csv("pseed.fin.amps.csv")
@@ -28,10 +29,9 @@ compute_se<-function(amp.sum){
 #3-#4: Compute the mean maximum of all amp.sums across all fin-beat cycles
 pseed.sum.max <- pseed.wide%>%
   group_by(fish,speed,bl.s)%>%
-  summarize(
-    amp.sum.mean=mean(amp.sum,na.rm=TRUE),
-    amp.sum.se=compute_se(amp.sum))
-
+  summarize(amp.sum.mean=mean(amp.sum,na.rm=TRUE),
+    amp.sum.se=compute_se(amp.sum))%>%
+  print()
 
 #5: Plot the mean amp.sum vs. specific swimming speed and add error bars that correspond to the SE of amp.sum
 ggplot(pseed.sum.max, aes(x = speed, y = amp.sum.mean, color = fish)) +
