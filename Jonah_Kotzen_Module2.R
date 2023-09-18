@@ -18,7 +18,7 @@ pseed.wide <- pseed2 %>%
   select(-amp) %>%
   pivot_wider(names_from = fin, values_from = amp.bl) %>%
   mutate(amp.sum = L+R)
-View(pseed.wide)
+pseed.wide
 
 
 # Step 2: Create a custom function to compute the standard error of the mean (SE) and for finding maxes
@@ -57,10 +57,10 @@ pseed.sum.max %>%
 
 # Step 5: Merge external_data with pseed.sum.max
 pseed.met.rate <- read_csv("pseed.met.rate.csv")
-pseed.met.rate2 <- merge(x = pseed.sum.max, y = pseed.met.rate[, c("date", "met.rate")], by = "date", all.x = TRUE)
+pseed.final <- merge(x = pseed.sum.max, y = pseed.met.rate[, c("date", "met.rate")], by = "date", all.x = TRUE)
 
 
 # Step 6: Plot metabolic power output vs. mean maximum of amp.sum
-pseed.met.rate2 %>%
+pseed.final %>%
   ggplot(aes(x = amp.sum.mean, y = met.rate, colour = fish)) +
   geom_point()
