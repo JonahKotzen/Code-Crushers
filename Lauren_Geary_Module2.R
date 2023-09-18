@@ -21,12 +21,12 @@ pseed.wide <- pseed2 %>%
   print()
 
 #2Custom function that computes Standard Error of the Mean (SE)
-compute_se<-function(x){
+se_mean<-function(x){
   se <- sd(x) / sqrt(length(x))
   return(se)
 }
 
-#3) Determine the maxes and then find the mean max of amp.sum values
+#3) Calculate the mean maximum amp.sum for each specific swimming speed and fish
 find.maxes <- function(x,y,mult=100){
   f <- fget(features(x=x,y=y*mult))[2:3]%>%
     as_tibble()%>%
@@ -39,7 +39,7 @@ pseed.peaks <- pseed.wide%>%
   mutate(peak=frame%in% find.maxes(frame,amp.sum))%>%
   filter(peak==T)
 
-#4) Add the amp.sum.se values (this is also the code that adds amp.sum.max)
+#4)Adding column amp.sum.se
 pseed.sum.max <- pseed.peaks%>%
   group_by(fish,speed,bl.s)%>%
   summarize(
@@ -63,4 +63,4 @@ view(pseed.final)
 pseed.met.rate2%>%
   ggplot(aes(x=amp.sum.mean, y=met.rate, colour = fish))+geom_point()
   labs(x = "Mean amp.sum", y = "Metabolic Power Output", title = "Metabolic Power vs. Mean amp.sum")
-
+  
