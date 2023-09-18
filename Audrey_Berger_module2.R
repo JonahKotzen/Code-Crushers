@@ -53,7 +53,7 @@ pseed.met.rate <- read_csv("pseed.met.rate.csv")
 
 #Join the pseed.met.rate table with pseed.sum.max
 pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="bl.s")%>%
-  select(-fish.y)%>%
+  select(-fish.y)%>% #the new tibble had two fish columns, this code removes the extra
   rename("Fish"="fish.x")  
 view(pseed.final)
 
