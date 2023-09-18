@@ -52,10 +52,12 @@ ggplot(pseed.sum.max,aes(x=bl.s,y=amp.sum.mean,col=fish)) +
 pseed.met.rate <- read_csv("pseed.met.rate.csv")
 
 #Join the pseed.met.rate table with pseed.sum.max
-
-pseed.final <- merge(x=pseed.sum.max,y=pseed.met.rate[c("date","met.rate")], by="date",all.x=TRUE)
-  
+pseed.final <- left_join(pseed.sum.max, pseed.met.rate, by="bl.s")%>%
+  select(-fish.y)%>%
+  rename("Fish"="fish.x")  
 view(pseed.final)
 
 #7) Use ggplot to plot metabolic power output vs mean max of amp.sum
-ggplot(pseed.final,aes(x=amp.sum.mean,y=met.rate,col=Fish))+geom_point()
+pseed.final%>%
+ggplot(aes(x=amp.sum.mean,y=met.rate,col=Fish))+geom_point()
+labs(x="Mean amp.sum", y="Metabolic Output", title="Metabolic Output vs Mean amp.sum")
